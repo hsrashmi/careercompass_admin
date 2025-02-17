@@ -27,8 +27,7 @@ class ILPUserBase(BaseModel):
     gender: GenderEnum = Field(..., description="Gender must be 'male', 'female', or 'other'")
     created_at: Optional[datetime] = datetime.now()
     created_by: Optional[str] = "root@ilp.com"
-    last_updated_at: Optional[datetime] = None
-    last_updated_by: Optional[str] = None
+    
     @field_validator("phone1", "phone2")
     @classmethod
     def validate_phone(cls, value: str) -> str:
@@ -56,8 +55,6 @@ class ILPUserUpdate(BaseModel):
     state: Optional[str] = None
     country: Optional[str] = None
     gender: Optional[GenderEnum] = Field(None, description="Gender must be 'male', 'female', or 'other'")
-    created_at: Optional[datetime] = None
-    created_by: Optional[str] = None
     last_updated_at: Optional[datetime] = datetime.now()
     last_updated_by: Optional[str] = None
 

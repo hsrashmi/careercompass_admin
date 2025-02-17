@@ -7,15 +7,14 @@ from src.dependencies import get_token_header
 from src.internal import admin
 from src.routers.api import router as router_api
 from src.routers.handlers.http_error import http_error_handler
+from logger import logger
 
-
-###
-# Main application file
-###
 
 def get_application() -> FastAPI:
     ''' Configure, start and return the application '''
-
+    ## Logging
+    logger.info("Starting application")
+    
     ## Start FastApi App 
     application = FastAPI()
 
@@ -36,15 +35,6 @@ def get_application() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
-    # ## Example of admin route
-    # application.include_router(
-    #     admin.router,
-    #     prefix="/admin",
-    #     tags=["admin"],
-    #     dependencies=[Depends(get_token_header)],
-    #     responses={418: {"description": "I'm a teapot"}},
-    # )
 
     return application
 

@@ -1,7 +1,7 @@
 import uuid
 import bcrypt
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, Field
+from typing import Optional, List, Dict, Any
 import operator
 from sqlalchemy.sql.expression import desc, asc
 
@@ -44,6 +44,9 @@ def get_filter_conditions(filters: dict, table_fields: list) -> list:
 
 def get_order_by_conditions(order_by: list, table_fields: list) -> tuple:
     ordering = []
+    if not order_by:
+        return ordering
+
     for field in order_by:
         is_desc = field.startswith("-")  # Check for descending order
         field_name = field.lstrip("-")  # Remove '-' if present
@@ -77,3 +80,11 @@ class error_message_response(BaseModel):
     type: str = "error"  
     message: str
     status_code: int
+
+
+class UserQueryRequest(BaseModel):
+    fields: Optional[List[str]] = None
+    filters: Optional[Dict[str, Any]] = None
+    page_no: int = Field(1, ge=1)          # Page must be ≥ 1
+    page_size: int = Field(10, ge=1, le=100)  # Page size between 1 and 100
+    order_by: Optional[List[str]] = None

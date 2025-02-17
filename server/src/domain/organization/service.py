@@ -11,6 +11,10 @@ def get_organization(db: Session, org_id: str):
 def get_organizations(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Organization).offset(skip).limit(limit).all()
 
+def get_organizations_by_params(db: Session, selected_fields: list, filters:list, ordering:list, skip: int = 0, limit: int = 100):
+    orm_attributes = [getattr(models.Organization, field) for field in selected_fields]
+    return db.query(models.Organization).with_entities(*orm_attributes).filter(*filters).order_by(*ordering).offset(skip).limit(limit).all()
+
 def create_organization(db: Session, organization: schemas.OrganizationBase):
     try:
         db_organization = models.Organization(**organization.model_dump())
@@ -22,13 +26,12 @@ def create_organization(db: Session, organization: schemas.OrganizationBase):
         raise HTTPException(status_code=400, detail=_extract_detail_text(str(e)))
     return db_organization
 
-def update_organization(db: Session, org_id: str, organization: schemas.OrganizationBase):
+def update_organization(db: Session, org_id: str, organization: schemas.OrganizationUpdate):
     try:
         db_organization = db.query(models.Organization).filter(models.Organization.organization_id == org_id).first()
         if not db_organization:
-            raise HTTPException(status_code=404, detail=ORG_DOES_NOT_EXIST_ERROR)
-        # Update each field using setattr
-        for key, value in organization.model_dump(exclude_unset=True).items():
+            raise HTTPException(status_code=404, detail=ORG_DOES_NOT_EXIST_ERROR)        
+        for key, value in organization.model_dump(exclude_none=True).items():
             setattr(db_organization, key, value)
         db.commit()
         db.refresh(db_organization)

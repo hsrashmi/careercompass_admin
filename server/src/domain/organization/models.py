@@ -21,3 +21,8 @@ class Organization(Base):
     last_updated_at = Column(DateTime(timezone=True), default=None)
     created_by = Column(String, ForeignKey('ilp_users.user_id'))
     last_updated_by =  Column(String, ForeignKey('ilp_users.user_id'))
+    
+    @classmethod
+    def get_valid_fields(cls):
+        return {column.name: column for column in cls.__table__.columns}
+

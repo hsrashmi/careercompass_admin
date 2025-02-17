@@ -24,3 +24,7 @@ USER_DELETE_SUCCESSFUL = "User deleted successfully"
 ORG_CREATE_SUCCESSFUL = "Organization created successfully"
 ORG_UPDATE_SUCCESSFUL = "Organization updated successfully"
 ORG_DELETE_SUCCESSFUL = "Organization deleted successfully"
+
+SCHOOL_CREATE_SUCCESSFUL = "School created successfully"
+SCHOOL_UPDATE_SUCCESSFUL = "School updated successfully"
+SCHOOL_DELETE_SUCCESSFUL = "School deleted successfully"

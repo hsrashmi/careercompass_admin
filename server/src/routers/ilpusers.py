@@ -1,21 +1,14 @@
-from typing import List, Optional, Any, Dict
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from .converter import ilpuser_converter
 from ..dependencies import get_db
 from ..domain.ilpuser import service, schemas, models
-from .util_functions import generate_uuid, string_hash, success_message_response, get_order_by_conditions, get_filter_conditions, get_select_fields
-from pydantic import BaseModel, Field
-from resources.strings import USER_DOES_NOT_EXIST_ERROR, EMAIL_ALREADY_EXISTS_ERROR, INVALID_FIELDS_IN_REQUEST_ERROR
+from .util_functions import UserQueryRequest, generate_uuid, string_hash, success_message_response, get_order_by_conditions, get_filter_conditions, get_select_fields
+from resources.strings import USER_DOES_NOT_EXIST_ERROR, EMAIL_ALREADY_EXISTS_ERROR
 
 router = APIRouter(tags=["ilpuser"])
 
-class UserQueryRequest(BaseModel):
-    fields: Optional[List[str]] = None
-    filters: Optional[Dict[str, Any]] = None
-    page: int = Field(1, ge=1)          # Page must be ≥ 1
-    page_size: int = Field(10, ge=1, le=100)  # Page size between 1 and 100
-    order_by: Optional[List[str]] = None
 
 @router.post("/ilpuser/", response_model=schemas.ILPUserResponse)
 def create_user(user: schemas.ILPUserBase, db: Session = Depends(get_db)):
@@ -28,7 +21,9 @@ def create_user(user: schemas.ILPUserBase, db: Session = Depends(get_db)):
     return service.create_user(db=db, user=updated_user)
 
 @router.get("/ilpuser/", response_model=List[schemas.ILPUserResponse])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_users(page_no: int = 1, page_size: int = 100, db: Session = Depends(get_db)):
+    limit = page_size
+    skip = (page_no - 1) * page_size  # Offset calculation
     users = service.get_users(db, skip=skip, limit=limit)
     return ilpuser_converter.convert_many(users)
 
@@ -39,15 +34,14 @@ def read_user(user_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail=USER_DOES_NOT_EXIST_ERROR)
     return ilpuser_converter.convert(db_user)   
 
-
 @router.post("/getIlpusersByParams/", response_model=list, response_model_exclude_none=True)
 def read_users(
         request: UserQueryRequest, 
         db: Session = Depends(get_db)):
-    
+
     # Get all valid columns from the User model
     table_fields = models.ILPUser.get_valid_fields()    
-    
+  
     selected_fields = get_select_fields(request.fields, table_fields)
 
     filter_cond = get_filter_conditions(request.filters, table_fields)
@@ -56,7 +50,7 @@ def read_users(
 
     # Calculate Limit and Offset based on Page Number
     limit = request.page_size
-    skip = (request.page - 1) * request.page_size  # Offset calculation
+    skip = (request.page_no - 1) * request.page_size  # Offset calculation
 
     db_users = service.get_users_by_params(db, selected_fields, filter_cond, ordering, skip=skip, limit=limit)
     return [dict(zip(selected_fields, user)) for user in db_users]
