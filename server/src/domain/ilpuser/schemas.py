@@ -18,7 +18,7 @@ class ILPUserBase(BaseModel):
     profile_pic_url: Optional[str] = None
     phone1: str = Field(..., description="Phone number must be a 10-digit integer")
     phone2: Optional[str] = Field(None, description="Phone number must be a 10-digit integer")
-    email: EmailStr | None = Field(default=None)
+    email: EmailStr = Field(default=None)
     password: str
     address: str
     city: str
