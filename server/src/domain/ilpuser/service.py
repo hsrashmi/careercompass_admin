@@ -1,13 +1,21 @@
 from sqlalchemy.orm import Session
 from . import models, schemas
 from fastapi import HTTPException
-from resources.strings import USER_DOES_NOT_EXIST_ERROR, USER_DELETE_SUCCESSFUL, USER_UPDATE_SUCCESSFUL
+from resources.strings import USER_DOES_NOT_EXIST_ERROR, USER_DELETE_SUCCESSFUL, USER_UPDATE_SUCCESSFUL, AUTHENTICATION_FAILED_ERROR
 import bcrypt
 import re
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
 
+def login_user(db: Session, email: str, password: str):
+    user = db.query(models.ILPUser).filter(models.ILPUser.email == email).first()
+    is_pwd_same = verify_password(password, user.password)
+    print("is pwd match ", is_pwd_same)
+    if not user or not is_pwd_same:
+        raise HTTPException(status_code=401, detail=AUTHENTICATION_FAILED_ERROR)
+    return user
+        
 
 def get_user(db: Session, user_id: str):
     return db.query(models.ILPUser).filter(models.ILPUser.user_id == user_id).first()

@@ -18,6 +18,15 @@ def get_application() -> FastAPI:
     ## Start FastApi App 
     application = FastAPI()
 
+    ## Allow cors
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=ALLOWED_HOSTS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
     # ## Generate database tables
     Base.metadata.create_all(bind=engine)
 
@@ -25,16 +34,7 @@ def get_application() -> FastAPI:
     application.include_router(router_api, prefix=API_PREFIX)
 
     ## Add exception handlers
-    application.add_exception_handler(HTTPException, http_error_handler)
-
-    ## Allow cors
-    application.add_middleware(
-        CORSMiddleware,
-        allow_origins=ALLOWED_HOSTS or ["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    application.add_exception_handler(HTTPException, http_error_handler)    
 
     return application
 

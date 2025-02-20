@@ -4,6 +4,8 @@
 
 INVALID_FIELDS_IN_REQUEST_ERROR = "Invalid fields requested"
 
+AUTHENTICATION_FAILED_ERROR = "Authentication failed"
+
 # Errors does not exist
 ORG_DOES_NOT_EXIST_ERROR = "Organization does not exist"
 SCHOOL_DOES_NOT_EXIST_ERROR = "School does not exist"

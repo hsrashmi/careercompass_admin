@@ -4,10 +4,18 @@ from sqlalchemy.orm import Session
 from .converter import ilpuser_converter
 from ..dependencies import get_db
 from ..domain.ilpuser import service, schemas, models
-from .util_functions import UserQueryRequest, generate_uuid, string_hash, success_message_response, get_order_by_conditions, get_filter_conditions, get_select_fields
-from resources.strings import USER_DOES_NOT_EXIST_ERROR, EMAIL_ALREADY_EXISTS_ERROR
+from .util_functions import UserQueryRequest, LoginQueryRequest, generate_uuid, string_hash, success_message_response, get_order_by_conditions, get_filter_conditions, get_select_fields
+from resources.strings import USER_DOES_NOT_EXIST_ERROR, EMAIL_ALREADY_EXISTS_ERROR, AUTHENTICATION_FAILED_ERROR
 
 router = APIRouter(tags=["ilpuser"])
+
+@router.post("/login/", response_model=schemas.ILPUserResponse)
+def login_user(request: LoginQueryRequest,db: Session = Depends(get_db)):
+    print(request.email, request.password)
+    db_user = service.get_user_by_email(db, email=request.email)
+    if not db_user:
+        raise HTTPException(status_code=401, detail=AUTHENTICATION_FAILED_ERROR)
+    return service.login_user(db=db, email=request.email, password=request.password)
 
 
 @router.post("/ilpuser/", response_model=schemas.ILPUserResponse)

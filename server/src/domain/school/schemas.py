@@ -1,22 +1,19 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 from datetime import datetime
 
 class SchoolBase(BaseModel):
     school_id: Optional[str] = None
     name: str
     long_name: str
-    last_name: str
     dise_code: int = Field(..., ge=10**10, le=10**11 - 1, description="Phone number must be a 10-digit integer")    
     city: str
     state: str
     pincode: int
     owner_id: int
     organization_id: int
-    created_at: Optional[datetime] = None
-    created_by: Optional[str] = None
-    last_updated_at: Optional[datetime] = None
-    last_updated_by: Optional[str] = None
+    created_at: Optional[datetime] = datetime.now()
+    created_by: Optional[str] = "root@ilp.com"
 
 class SchoolUpdate(BaseModel):
     school_id: Optional[str] = None
@@ -29,15 +26,13 @@ class SchoolUpdate(BaseModel):
     pincode: Optional[int] = None
     owner_id: Optional[int] = None
     organization_id: Optional[int] = None
-    created_at: Optional[datetime] = None
-    created_by: Optional[str] = None
-    last_updated_at: Optional[datetime] = None
+    last_updated_at: Optional[datetime] = datetime.now()
     last_updated_by: Optional[str] = None
 
 class ILPUserCreate(SchoolBase):
  pass
 
 class ILPUser(SchoolBase):
-    user_id: str
+    school_id: str
     class Config:
         orm_mode = True

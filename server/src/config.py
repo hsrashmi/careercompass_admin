@@ -15,8 +15,4 @@ config = Config(".env")
 
 ROUTE_PREFIX_V1 = "/v1"
 
-ALLOWED_HOSTS: List[str] = config(
-    "ALLOWED_HOSTS",
-    cast=CommaSeparatedStrings,
-    default="localhost, 127.0.0.0",
-)
+ALLOWED_HOSTS: List[str] = config("ALLOWED_HOSTS")

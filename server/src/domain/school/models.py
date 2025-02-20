@@ -8,7 +8,7 @@ class ILPUser(Base):
     __tablename__ = "schools"
 
     school_id = Column(String, primary_key=True)
-    name = Column(String)
+    name = Column(String, nullable=False)
     long_name = Column(String)
     dise_code = Column(Integer)
     city = Column(String)
@@ -22,3 +22,7 @@ class ILPUser(Base):
     last_updated_at = Column(DateTime(timezone=True), default=None)
     created_by = Column(String, ForeignKey('ilp_users.user_id'))
     last_updated_by =  Column(String, ForeignKey('ilp_users.user_id'))
+
+    @classmethod
+    def get_valid_fields(cls):
+        return {column.name: column for column in cls.__table__.columns}

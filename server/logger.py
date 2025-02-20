@@ -2,12 +2,17 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 from starlette.config import Config
+from datetime import datetime
 
 # Load environment variables
 config = Config(".env")  # Automatically loads variables from .env file
 
+# Get today's date in YYYY-MM-DD format
+today_date = datetime.now().strftime("%Y-%m-%d")
+
 # Read values
-LOG_FILE = config("LOG_FILE", default="app.log")
+LOG_FILE_PATTERN = config("LOG_FILE_PATTERN", default="adminlogs_{date}.log")
+LOG_FILE = LOG_FILE_PATTERN.format(date=today_date)
 LOG_LEVEL = config("LOG_LEVEL", default="INFO")
 LOG_MAX_SIZE = config("LOG_MAX_SIZE", cast=int, default=5)  # Convert MB to bytes
 LOG_BACKUP_COUNT = config("LOG_BACKUP_COUNT", cast=int, default=3)
